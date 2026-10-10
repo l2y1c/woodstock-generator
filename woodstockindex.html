@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>糊塗塌克隨機生成器</title>
+    <style>
+        /* 1. 設定純綠色背景與全螢幕滿版 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #2e8b57; /* 經典純綠色背景 */
+            font-family: Arial, sans-serif;
+            user-select: none; /* 防止點擊時選取到文字 */
+            cursor: pointer;
+        }
+
+        /* 2. 動態出現的糊塗塌克樣式 */
+        .woodstock {
+            position: absolute;
+            pointer-events: none; /* 讓生成的圖片不會擋住後續的點擊 */
+            transform-origin: center center;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* 登場時的彈跳動畫效果 */
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            }
+            100% {
+                opacity: 1;
+                /* transform 屬性會在 JS 中根據動態旋轉角度調整 */
+            }
+        }
+
+        /* 3. 清空按鈕樣式 */
+        #clear-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #2e8b57;
+            background-color: #ffffff;
+            border: 2px solid #1e5e3a;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            z-index: 9999; /* 確保按鈕永遠在大圖層最上方 */
+            transition: all 0.2s ease;
+        }
+
+        #clear-btn:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        #clear-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 清空按鈕 -->
+    <button id="clear-btn">清空畫面</button>
+
+    <script>
+        // 4. 設定糊塗塌克圖片來源清單（對應 assets 資料夾中的 w1~w5）
+        // 如果你的副檔名不是 .png，可以手動在這裡修改（例如改成 .jpg）
+        const woodstockImages = [
+            'assets/w1.png',
+            'assets/w2.png',
+            'assets/w3.png',
+            'assets/w4.png',
+            'assets/w5.png'
+        ];
+
+        // 5. 全螢幕點擊事件監聽
+        document.body.addEventListener('click', function(event) {
+            // 建立圖片標籤 <img>
+            const img = document.createElement('img');
+            img.classList.add('woodstock');
+
+            // 隨機選擇一張圖片來源 (w1 ~ w5 隨機抽選)
+            const randomImg = woodstockImages[Math.floor(Math.random() * woodstockImages.length)];
+            img.src = randomImg;
+
+            // 隨機設定圖片大小（範圍介於 60px 到 150px）
+            const randomSize = Math.floor(Math.random() * 91) + 60;
+            img.style.width = `${randomSize}px`;
+
+            // 隨機設定旋轉角度（-30度 到 30度 之間）
+            const randomRotate = Math.floor(Math.random() * 61) - 30;
+
+            // 取得點擊座標，將圖片中心點對準點擊位置
+            const x = event.clientX;
+            const y = event.clientY;
+            img.style.left = `${x}px`;
+            img.style.top = `${y}px`;
+
+            // 設定定位居中與旋轉角度
+            img.style.transform = `translate(-50%, -50%) rotate(${randomRotate}deg)`;
+
+            // 將圖片加入到網頁畫面中
+            document.body.appendChild(img);
+        });
+
+        // 6. 清空按鈕點擊事件
+        const clearBtn = document.getElementById('clear-btn');
+        clearBtn.addEventListener('click', function(event) {
+            // 阻止事件冒泡，避免點擊按鈕時同時又生成一隻糊塗塌克
+            event.stopPropagation();
+
+            // 找到畫面上所有 class 為 woodstock 的圖片並移除
+            const allWoodstocks = document.querySelectorAll('.woodstock');
+            allWoodstocks.forEach(item => item.remove());
+        });
+    </script>
+</body>
+</html>
